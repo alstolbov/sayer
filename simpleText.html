@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Geoworks - разработка и внедрение геоинформационных систем</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+        <style type="text/css">
+            #myTextWr {
+                min-height: 40px;
+            }
+            .resWord {
+                display: inline-block;
+                margin-right: 10px;
+                padding: 5px;
+                border: 1px solid #ddd;
+                background-color: #fff;
+                cursor: pointer;
+            }
+            .resWord.active {
+                background-color: #666;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="myForm"></div>
+        <script type="text/javascript">
+            var _STORE = {};
+            _STORE.text = [];
+            _STORE.currentTextPos = lastTextPos();
+ 
+            $('#myForm').html('<div id="myTextWr"></div><input type="text" id="myInput" value=""/>');
+
+            $('body').on('keyup', '#myInput', function (e) {
+                var code = e.which;
+                var val = $(this).val();
+                // if (val.slice(-1) == " ") {
+                if (code == 32 || code == 13) {
+                    if (code == 13) {
+                        e.preventDefault();
+                    }
+                    _STORE.text[_STORE.currentTextPos] = code == 32 ? val.slice(0,-1) : val;
+                    $(this).val("");
+                    _STORE.currentTextPos = lastTextPos();
+                    printText();
+                }
+            });
+
+            $('body').on('click', '.resWord', function () {
+                var id = lastTextPos();
+                var data = "";
+                if (!$(this).hasClass('active')) {
+                    id = $(this).attr('data-item');
+                    data = _STORE.text[id];
+                    $('.resWord').each(function () { $(this).removeClass('active'); });
+                    $(this).addClass('active');
+                } else {
+                    $(this).removeClass('active');
+                }
+
+                $('#myInput').val(data);
+                _STORE.currentTextPos = id;
+            });
+
+            function lastTextPos() {
+                return _STORE.text.length;
+            }
+
+            var printText = function () {
+                var resText = "";
+                _STORE.text.forEach(function (word, id) {
+                    resText += '<span class="resWord" data-item="' + id + '">' + word + '</span>';
+                });
+                $('#myTextWr').html(resText);
+            };
+        </script>
+    </body>
+</html>
