@@ -4,6 +4,7 @@
         <meta charset="UTF-8" />
         <title>Geoworks - разработка и внедрение геоинформационных систем</title>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
         <style type="text/css">
             #myTextWr {
                 min-height: 40px;
@@ -28,7 +29,9 @@
             _STORE.text = [];
             _STORE.currentTextPos = lastTextPos();
  
-            $('#myForm').html('<div id="myTextWr"></div><input type="text" id="myInput" value=""/>');
+            $('#myForm').html('<ul id="myTextWr"></ul><input type="text" id="myInput" value=""/>');
+
+            $('#myTextWr').sortable();
 
             $('body').on('keyup', '#myInput', function (e) {
                 var code = e.which;
@@ -68,7 +71,7 @@
             var printText = function () {
                 var resText = "";
                 _STORE.text.forEach(function (word, id) {
-                    resText += '<span class="resWord" data-item="' + id + '">' + word + '</span>';
+                    resText += '<li class="resWord" data-item="' + id + '">' + word + '</li>';
                 });
                 $('#myTextWr').html(resText);
             };
