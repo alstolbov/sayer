@@ -1,22 +1,25 @@
 var _STORE = {};
+var LS = $.localStorage;
 
-function init (parentId) {
+function initlocalStorage () {
+    if (!LS.isSet('myTpl')) {
+        LS.set('myTpl', []);
+    }
+}
+
+function init () {
+
+    initlocalStorage();
 
     getDefaultState();
 
-    $(parentId).html('  <div class="functWr">\
-                            <div id="delWord" class="btn" style="display: none;">Delete</div>\
-                        </div>\
-                        <ul id="myTextWr">\
-                        </ul>\
-                        <input type="text" id="myInput" value=""/>\
-                        <div class="finalBtnsWr">\
-                            <div id="clearText" class="btn unactive">Clear</div>\
-                            <div id="saveText" class="btn unactive" >Save</div>\
-                            <div id="showText" class="btn unactive">Show</div>\
-                        </div>\
-                        <div id="fullSizeWr" style="display: none;"></div>');
-
+    getUpdate(function (err, html) {
+        if (!err && html !== "false") {
+            $('#messageWr').html(html);
+        } else {
+            $('#messageWr').css('display', 'none');
+        }
+    });
 
     $("#myTextWr .resWord").draggable();
 
@@ -94,49 +97,44 @@ function init (parentId) {
         _STORE.text.forEach(function (wordData, id) {
             resText += '<span>' + wordData.word + ' </span>';
         });
-        $('#fullSizeWr').css('display', 'block');
-        $('#fullSizeWr').html(resText);
-        _STORE.isFullView = !_STORE.isFullView;
+        showFullSize(resText);
     });
 
     $('body').on('click', '#fullSizeWr', function () {
-        $('#fullSizeWr').css('display', 'none');
-        $('#fullSizeWr').html('');
-        _STORE.isFullView = !_STORE.isFullView;
+        showFullSize();
     });
 
     $('body').on('click', '#clearText', function () {
+        $('#myInput').val('');
         getDefaultState();
         checkBtns();
         printText();
     });
-}
 
-var uuid = function () {
-    return Math.random().toString(36).substring(7);
-};
-
-var getPosById = function (id) {
-    var res = -1;
-    _STORE.text.forEach(function (el, iter) {
-        if (el.id == id) {
-            res = iter;
-        }
+    $('body').on('click', '#myTempl', function () {
+        var HTML = '';
+        LS.get('myTpl').forEach(function (tpl) {
+            HTML += '<div class="btn test">';
+            tpl.forEach(function (wordData) {
+                HTML += '<span>' + wordData.word + ' </span>';
+            });
+            HTML += '</div>';
+        });
+        showFullSize(HTML);
+        $(".test").draggable();
     });
-    return res;
-};
 
-var lastTextPos = function () {
-    return _STORE.text.length;
-};
+    $('body').on('click', '#saveText', function () {
+        var tmp = LS.get('myTpl');
+        tmp.push(_STORE.text);
+        LS.set('myTpl', tmp);
+        $('#myInput').val('');
+        getDefaultState();
+        checkBtns();
+        printText();
+    });
 
-var getDefaultState = function () {
-    _STORE.text = [];
-    _STORE.isFullView = false;
-    _STORE.currentTextPos = lastTextPos();
-    _STORE.wordEvent = {};
-
-};
+}
 
 var printText = function () {
     var resText = "";
@@ -144,6 +142,17 @@ var printText = function () {
         resText += '<li class="resWord" data-item="' + wordData.id + '">' + wordData.word + '</li>';
     });
     $('#myTextWr').html(resText);
+};
+
+var showFullSize = function (text) {
+    if (text) {
+        $('#fullSizeWr').css('display', 'block');
+        $('#fullSizeWr').html(text);
+    } else {
+        $('#fullSizeWr').css('display', 'none');
+        $('#fullSizeWr').html('');
+    }
+    _STORE.isFullView = !_STORE.isFullView;
 };
 
 var checkBtns = function () {
@@ -166,44 +175,12 @@ var checkBtns = function () {
     });
 };
 
-var changePosInArray = function (arr, old_index, new_index) {  
-    while (old_index < 0) {  
-        old_index += arr.length;  
-    }  
-    while (new_index < 0) {  
-        new_index += arr.length;  
-    }  
-    if (new_index >= arr.length) {  
-        var k = new_index - arr.length;  
-        while ((k--) + 1) {  
-            arr.push(undefined);  
-        }  
-    }  
-     arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);    
-   return arr;  
-};
-
-var removeWordFromArray = function (id) {
-    var pos = getPosById(id);
-    if (pos + 1) {
-        _STORE.text.splice(pos, 1); 
-    }
-    return _STORE.text;
-};
-
-var eventDispatcher = function (evnt) {
-    console.log(evnt);
-    switch (evnt.event) {
-        case "editWord":
-             _STORE.currentTextPos = evnt.wordId;
-            break;
-        case "moveToPos":
-            if (evnt.oldPos !== evnt.newPos) {    
-                _STORE.text = changePosInArray(_STORE.text, evnt.oldPos, evnt.newPos);
-            }
-            break;
-        case "delete":
-            _STORE.text = removeWordFromArray(evnt.wordId);
-            break;
-    }
+var getUpdate = function (back) {
+    $.ajax({
+        type: "GET",
+        url: "http://10.10.10.40:8080/upd.html",
+        cache: false,
+        success: function (data) { back (null, data); },
+        error: function (err) { back (err, null); }
+    });
 };

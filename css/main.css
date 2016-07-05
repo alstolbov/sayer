@@ -35,3 +35,8 @@
 .functWr {
     height: 50px;
 }
+#messageWr {
+    width: 100px;
+    height: 30px;
+    border: 1px solid #666;
+}
