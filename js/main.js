@@ -4,7 +4,10 @@ function init (parentId) {
 
     getDefaultState();
 
-    $(parentId).html(' <ul id="myTextWr">\
+    $(parentId).html('  <div class="functWr">\
+                            <div id="delWord" class="btn" style="display: none;">Delete</div>\
+                        </div>\
+                        <ul id="myTextWr">\
                         </ul>\
                         <input type="text" id="myInput" value=""/>\
                         <div class="finalBtnsWr">\
@@ -14,14 +17,40 @@ function init (parentId) {
                         </div>\
                         <div id="fullSizeWr" style="display: none;"></div>');
 
-    $('#myTextWr').sortable({
-        stop: function (event, ui) {
-            var oldPos = ui.item.attr('data-item');
-            var newPos = ui.item.index();
-            console.log(oldPos, newPos);
-            _STORE.text = changePosInArray(_STORE.text, oldPos, newPos);
+
+    $("#myTextWr .resWord").draggable();
+
+    $("#delWord").droppable({
+        hoverClass: "hover",
+        drop: function( event, ui ) {
+            var id = ui.draggable.attr('data-item');
+            eventDispatcher({
+                wordId: id,
+                // wordPos: getPosById(ui.draggable.attr('data-item')),
+                event: 'delete'
+            });
+            _STORE.currentTextPos = lastTextPos();
+            checkBtns();
+            $('.resWord[data-item="' + id + '"]').remove();
         }
     });
+
+    $('#myTextWr').sortable({
+        start: function () {
+            $("#delWord").css('display', 'inline-block');
+        },
+        stop: function (event, ui) {
+            $("#delWord").css('display', 'none');
+            eventDispatcher({
+                wordId: ui.item.attr('data-item'),
+                oldPos: getPosById(ui.item.attr('data-item')),
+                event: 'moveToPos',
+                newPos: ui.item.index()
+            });
+        }
+    });
+
+    $('#myInput').focus();
 
     $('body').on('keyup', '#myInput', function (e) {
         var code = e.which;
@@ -33,6 +62,7 @@ function init (parentId) {
             }
             _STORE.text[_STORE.currentTextPos] = {};
             _STORE.text[_STORE.currentTextPos].word = code == 32 ? val.slice(0,-1) : val;
+            _STORE.text[_STORE.currentTextPos].id = uuid();
             $(this).val("");
             _STORE.currentTextPos = lastTextPos();
             checkBtns();
@@ -44,7 +74,7 @@ function init (parentId) {
         var id = lastTextPos();
         var data = "";
         if (!$(this).hasClass('active')) {
-            id = $(this).attr('data-item');
+            id = getPosById($(this).attr('data-item'));
             data = _STORE.text[id].word;
             $('.resWord').each(function () { $(this).removeClass('active'); });
             $(this).addClass('active');
@@ -53,7 +83,10 @@ function init (parentId) {
         }
 
         $('#myInput').val(data);
-        _STORE.currentTextPos = id;
+        eventDispatcher({
+            wordId: id,
+            event: 'editWord'
+        });
     });
 
     $('body').on('click', '#showText', function () {
@@ -79,6 +112,20 @@ function init (parentId) {
     });
 }
 
+var uuid = function () {
+    return Math.random().toString(36).substring(7);
+};
+
+var getPosById = function (id) {
+    var res = -1;
+    _STORE.text.forEach(function (el, iter) {
+        if (el.id == id) {
+            res = iter;
+        }
+    });
+    return res;
+};
+
 var lastTextPos = function () {
     return _STORE.text.length;
 };
@@ -87,13 +134,14 @@ var getDefaultState = function () {
     _STORE.text = [];
     _STORE.isFullView = false;
     _STORE.currentTextPos = lastTextPos();
+    _STORE.wordEvent = {};
 
 };
 
 var printText = function () {
     var resText = "";
-    _STORE.text.forEach(function (wordData, id) {
-        resText += '<li class="resWord" data-item="' + id + '">' + wordData.word + '</li>';
+    _STORE.text.forEach(function (wordData) {
+        resText += '<li class="resWord" data-item="' + wordData.id + '">' + wordData.word + '</li>';
     });
     $('#myTextWr').html(resText);
 };
@@ -133,4 +181,29 @@ var changePosInArray = function (arr, old_index, new_index) {
     }  
      arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);    
    return arr;  
-} ;
+};
+
+var removeWordFromArray = function (id) {
+    var pos = getPosById(id);
+    if (pos + 1) {
+        _STORE.text.splice(pos, 1); 
+    }
+    return _STORE.text;
+};
+
+var eventDispatcher = function (evnt) {
+    console.log(evnt);
+    switch (evnt.event) {
+        case "editWord":
+             _STORE.currentTextPos = evnt.wordId;
+            break;
+        case "moveToPos":
+            if (evnt.oldPos !== evnt.newPos) {    
+                _STORE.text = changePosInArray(_STORE.text, evnt.oldPos, evnt.newPos);
+            }
+            break;
+        case "delete":
+            _STORE.text = removeWordFromArray(evnt.wordId);
+            break;
+    }
+};
