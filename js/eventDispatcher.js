@@ -12,5 +12,10 @@ var eventDispatcher = function (evnt) {
         case "delete":
             _STORE.text = removeWordFromArray(evnt.wordId);
             break;
+        case "editTpl":
+            _STORE.text = evnt.tpl;
+            _STORE.isTplEditView = evnt.tplId;
+            _STORE.currentTextPos = lastTextPos();
+            break;
     }
 };

@@ -3,7 +3,7 @@ var LS = $.localStorage;
 
 function initlocalStorage () {
     if (!LS.isSet('myTpl')) {
-        LS.set('myTpl', []);
+        LS.set('myTpl', {});
     }
 }
 
@@ -63,14 +63,29 @@ function init () {
             if (code == 13) {
                 e.preventDefault();
             }
-            _STORE.text[_STORE.currentTextPos] = {};
+            if (!_STORE.text.hasOwnProperty(_STORE.currentTextPos)) {
+                _STORE.text[_STORE.currentTextPos] = {};
+                _STORE.text[_STORE.currentTextPos].id = uuid();
+            }
             _STORE.text[_STORE.currentTextPos].word = code == 32 ? val.slice(0,-1) : val;
-            _STORE.text[_STORE.currentTextPos].id = uuid();
             $(this).val("");
             _STORE.currentTextPos = lastTextPos();
             checkBtns();
             printText();
         }
+    });
+
+    $('body').on('blur', '#myInput', function (e) {
+        var val = $(this).val();
+        if (!_STORE.text.hasOwnProperty(_STORE.currentTextPos)) {
+            _STORE.text[_STORE.currentTextPos] = {};
+            _STORE.text[_STORE.currentTextPos].id = uuid();
+        }
+        _STORE.text[_STORE.currentTextPos].word = val;
+        $(this).val("");
+        _STORE.currentTextPos = lastTextPos();
+        checkBtns();
+        printText();
     });
 
     $('body').on('click', '.resWord', function () {
@@ -93,14 +108,19 @@ function init () {
     });
 
     $('body').on('click', '#showText', function () {
-        var resText = "";
-        _STORE.text.forEach(function (wordData, id) {
-            resText += '<span>' + wordData.word + ' </span>';
-        });
-        showFullSize(resText);
+        showFullSize(
+            '<ul>' +
+            buildTextString(_STORE.text) + 
+            '</ul>'
+        );
     });
 
-    $('body').on('click', '#fullSizeWr', function () {
+    $('body').on('click', '.fullSizeExit', function () {
+        if (_STORE.isTplView) {
+            _STORE.isTplView = !_STORE.isTplView;
+            $('#myTempl').trigger('click');
+            return true;
+        }
         showFullSize();
     });
 
@@ -112,21 +132,53 @@ function init () {
     });
 
     $('body').on('click', '#myTempl', function () {
-        var HTML = '';
-        LS.get('myTpl').forEach(function (tpl) {
-            HTML += '<div class="btn test">';
-            tpl.forEach(function (wordData) {
-                HTML += '<span>' + wordData.word + ' </span>';
-            });
+        _STORE.isTplView = false;
+        var isEditable = false;
+        var HTML = '<div class="btn editabledTpl unactive">Редактировать</div>';
+        Object.keys(LS.get('myTpl')).forEach(function(key, index) {
+            HTML += '<div class="btn tplItem" data-item="' + key + '">' ;
+            HTML += buildTextString(LS.get('myTpl')[key].data);
             HTML += '</div>';
         });
         showFullSize(HTML);
-        $(".test").draggable();
+        $('.editabledTpl').on('click', function () {
+            isEditable = !isEditable;
+            $(this).toggleClass('unactive active');
+        });
+        $('.tplItem').on('click', function () {
+            var tplId = $(this).attr('data-item');
+            if (!isEditable) {
+                _STORE.isTplView = true;
+                showFullSize(
+                    '<ul>' +
+                    buildTextString(LS.get('myTpl')[tplId].data) +
+                    '</ul>'
+                );
+            } else {
+                _STORE.isTplView = false;
+                showFullSize();
+                $('#myInput').val();
+                eventDispatcher({
+                    tpl: LS.get('myTpl')[tplId].data,
+                    tplId: tplId,
+                    event: 'editTpl'
+                });
+                checkBtns();
+                printText();
+            }
+        });
     });
 
     $('body').on('click', '#saveText', function () {
         var tmp = LS.get('myTpl');
-        tmp.push(_STORE.text);
+        var tpl = {};
+        if (!_STORE.isTplEditView) {
+            tpl.range = 0;
+            tpl.data = _STORE.text;
+            tmp[uuid()] = tpl;
+        } else if (_STORE.isTplEditView) {
+            tmp[_STORE.isTplEditView].data = _STORE.text;
+        }
         LS.set('myTpl', tmp);
         $('#myInput').val('');
         getDefaultState();
@@ -137,20 +189,30 @@ function init () {
 }
 
 var printText = function () {
-    var resText = "";
-    _STORE.text.forEach(function (wordData) {
-        resText += '<li class="resWord" data-item="' + wordData.id + '">' + wordData.word + '</li>';
-    });
+    var resText = '<ul>';
+    resText += buildTextString(_STORE.text, 'resWord');
+    resText += '</ul>';
     $('#myTextWr').html(resText);
+};
+
+var buildTextString = function (src, className) {
+    var resText = '';
+    var className = className ? 'class="' + className + '" ' : '';
+    var dataItem;
+    src.forEach(function (wordData) {
+        dataItem = wordData.id ? ' data-item="' + wordData.id + '" ' : '';
+        resText += '<li ' + className + dataItem + '>' + wordData.word + '</li>';
+    });
+    return resText;
 };
 
 var showFullSize = function (text) {
     if (text) {
         $('#fullSizeWr').css('display', 'block');
-        $('#fullSizeWr').html(text);
+        $('.fullSizeContent').html(text);
     } else {
         $('#fullSizeWr').css('display', 'none');
-        $('#fullSizeWr').html('');
+        $('.fullSizeContent').html('');
     }
     _STORE.isFullView = !_STORE.isFullView;
 };
@@ -163,14 +225,14 @@ var checkBtns = function () {
 
     $('.finalBtnsWr .btn').each(function (ind, el) {
         var isToggle = false;
-        if (!show && !$(el).hasClass('unactive')) {
+        if (!show && !$(el).hasClass('disabled')) {
             isToggle = true;
         }
         if (show && !$(el).hasClass('active')) {
             isToggle = true;
         }
         if (isToggle) {
-            $(el).toggleClass('unactive active');
+            $(el).toggleClass('disabled active');
         }
     });
 };

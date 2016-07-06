@@ -20,9 +20,12 @@
     background-color: #fff;
     cursor: pointer;
 }
-.unactive {
+.disabled {
     opacity: 0.5;
     pointer-events: none;
+}
+.unactive {
+    opacity: 0.5;
 }
 #fullSizeWr {
     position: fixed;
