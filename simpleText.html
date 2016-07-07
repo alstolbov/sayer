@@ -8,24 +8,26 @@
         <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
         <script src="/lib/jquery.storageapi.min.js"></script>
         <script type="text/javascript" src="/js/main.js"></script>
+        <script type="text/javascript" src="/js/render.js"></script>
         <script type="text/javascript" src="/js/eventDispatcher.js"></script>
         <script type="text/javascript" src="/js/commonFunctions.js"></script>
+        <script type="text/javascript" src="/js/languages.js"></script>
     </head>
     <body>
         <div id="myForm">
             <div class="leftPanelWr">
-                <div id="myTempl" class="btn">Мои шаблоны</div>
+                <div id="myTempl" class="btn"></div>
             </div>
             <div class="functWr">
-                <div id="delWord" class="btn" style="display: none;">Delete</div>
+                <div id="delWord" class="btn" style="display: none;"></div>
             </div>
             <div id="myTextWr">
             </div>
             <input type="text" id="myInput" value=""/>
             <div class="finalBtnsWr">
-                <div id="clearText" class="btn disabled">Clear</div>
-                <div id="saveText" class="btn disabled" >Save</div>
-                <div id="showText" class="btn disabled">Show</div>
+                <div id="clearText" class="btn disabled"></div>
+                <div id="saveText" class="btn disabled"></div>
+                <div id="showText" class="btn disabled"></div>
             </div>
             <div id="fullSizeWr" style="display: none;">
                 <div class="fullSizeExit">X</div>
@@ -39,11 +41,11 @@
             + перемещение слова с сторе при переносе
             + обновление системы (автопредложение)
 
-            через куки:
-                - добавление фразы в "Любимое"
-                - СЛОВАРИ
-                - добавление слова в словарь
-                - подсказка при наборе
+            + добавление фразы в "Любимое"
+            - удаление фразы из "Любимое"
+            - СЛОВАРИ
+            - добавление слова в словарь
+            - подсказка при наборе
 
             Меню "Настройки":
                 - настройки стилей отображения (белое на черном, черное на белом? размер шрифта)

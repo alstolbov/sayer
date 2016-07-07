@@ -5,6 +5,9 @@ function initlocalStorage () {
     if (!LS.isSet('myTpl')) {
         LS.set('myTpl', {});
     }
+    if (!LS.isSet('lang')) {
+        LS.set('lang', 'ru');
+    }
 }
 
 function init () {
@@ -12,6 +15,12 @@ function init () {
     initlocalStorage();
 
     getDefaultState();
+
+    _STORE.panel = 'writer';
+
+    _Render();
+
+    _Localizer();
 
     getUpdate(function (err, html) {
         if (!err && html !== "false") {
@@ -77,15 +86,17 @@ function init () {
 
     $('body').on('blur', '#myInput', function (e) {
         var val = $(this).val();
-        if (!_STORE.text.hasOwnProperty(_STORE.currentTextPos)) {
-            _STORE.text[_STORE.currentTextPos] = {};
-            _STORE.text[_STORE.currentTextPos].id = uuid();
+        if (val !== '') {
+            if (!_STORE.text.hasOwnProperty(_STORE.currentTextPos)) {
+                _STORE.text[_STORE.currentTextPos] = {};
+                _STORE.text[_STORE.currentTextPos].id = uuid();
+            }
+            _STORE.text[_STORE.currentTextPos].word = val;
+            $(this).val("");
+            _STORE.currentTextPos = lastTextPos();
+            checkBtns();
+            printText();
         }
-        _STORE.text[_STORE.currentTextPos].word = val;
-        $(this).val("");
-        _STORE.currentTextPos = lastTextPos();
-        checkBtns();
-        printText();
     });
 
     $('body').on('click', '.resWord', function () {
@@ -108,20 +119,21 @@ function init () {
     });
 
     $('body').on('click', '#showText', function () {
-        showFullSize(
-            '<ul>' +
-            buildTextString(_STORE.text) + 
-            '</ul>'
-        );
+        _STORE.panel = 'showPhrase';
+        _Render();
     });
 
     $('body').on('click', '.fullSizeExit', function () {
+        _STORE.panel = 'writer';
         if (_STORE.isTplView) {
             _STORE.isTplView = !_STORE.isTplView;
-            $('#myTempl').trigger('click');
+            // $('#myTempl').trigger('click');
+            _STORE.panel = 'templates';
+            _Render();
             return true;
         }
-        showFullSize();
+        // showFullSize();
+        _Render();
     });
 
     $('body').on('click', '#clearText', function () {
@@ -132,41 +144,10 @@ function init () {
     });
 
     $('body').on('click', '#myTempl', function () {
+        _STORE.panel = 'templates';
         _STORE.isTplView = false;
-        var isEditable = false;
-        var HTML = '<div class="btn editabledTpl unactive">Редактировать</div>';
-        Object.keys(LS.get('myTpl')).forEach(function(key, index) {
-            HTML += '<div class="btn tplItem" data-item="' + key + '">' ;
-            HTML += buildTextString(LS.get('myTpl')[key].data);
-            HTML += '</div>';
-        });
-        showFullSize(HTML);
-        $('.editabledTpl').on('click', function () {
-            isEditable = !isEditable;
-            $(this).toggleClass('unactive active');
-        });
-        $('.tplItem').on('click', function () {
-            var tplId = $(this).attr('data-item');
-            if (!isEditable) {
-                _STORE.isTplView = true;
-                showFullSize(
-                    '<ul>' +
-                    buildTextString(LS.get('myTpl')[tplId].data) +
-                    '</ul>'
-                );
-            } else {
-                _STORE.isTplView = false;
-                showFullSize();
-                $('#myInput').val();
-                eventDispatcher({
-                    tpl: LS.get('myTpl')[tplId].data,
-                    tplId: tplId,
-                    event: 'editTpl'
-                });
-                checkBtns();
-                printText();
-            }
-        });
+         console.log('!');
+        _Render();
     });
 
     $('body').on('click', '#saveText', function () {
@@ -185,6 +166,37 @@ function init () {
         checkBtns();
         printText();
     });
+};
+
+var editTpl = function () {
+    var isEditable = false;
+    $('.editabledTpl').on('click', function () {
+        isEditable = !isEditable;
+        $(this).toggleClass('unactive active');
+    });
+
+    $('.tplItem').on('click', function () {
+        var tplId = $(this).attr('data-item');
+        if (!isEditable) {
+            _STORE.isTplView = true;
+            showFullSize(
+                '<ul>' +
+                buildTextString(LS.get('myTpl')[tplId].data) +
+                '</ul>'
+            );
+        } else {
+            _STORE.isTplView = false;
+            showFullSize();
+            $('#myInput').val();
+            eventDispatcher({
+                tpl: LS.get('myTpl')[tplId].data,
+                tplId: tplId,
+                event: 'editTpl'
+            });
+            checkBtns();
+            printText();
+        }
+    });    
 
 }
 
