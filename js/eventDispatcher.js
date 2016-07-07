@@ -17,5 +17,12 @@ var eventDispatcher = function (evnt) {
             _STORE.isTplEditView = evnt.tplId;
             _STORE.currentTextPos = lastTextPos();
             break;
+
+        case "deleteTpl":
+            LS.set('myTpl', removeTpl(evnt.tplId));
+            break;
+
+        case "rangeTpl":
+            break;
     }
 };

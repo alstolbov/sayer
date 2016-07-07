@@ -2,12 +2,17 @@ var _Render = function () {
     var HTML = '';
     if (_STORE.panel == 'templates') {
         HTML = '<div class="btn editabledTpl unactive">' + _Lang[LS.get('lang')]['editTpl'] + '</div>';
+        HTML += '<div class="btn" id="delTpl" style="display: none;">' + _Lang[LS.get('lang')]['delTpl'] + '</div>';
+        HTML += '<ul id="tplList">';
         Object.keys(LS.get('myTpl')).forEach(function(key, index) {
-            HTML += '<div class="btn tplItem" data-item="' + key + '">' ;
+            HTML += '<li class="btn tplItem" data-item="' + key + '"><ul>' ;
             HTML += buildTextString(LS.get('myTpl')[key].data);
-            HTML += '</div>';
+            HTML += '</ul></li>';
         });
+        HTML += '</ul>';
         showFullSize(HTML);
+        editTpl();
+        _STORE.backToPanel = 'writer';
     } else if (_STORE.panel == 'showPhrase') {
         showFullSize(
             '<ul>' +
@@ -18,9 +23,11 @@ var _Render = function () {
         HTML += '\
             <ul>\
                 <li class="btn" id="langChouse">' + _Lang[LS.get('lang')]['langChouse'] + '</li>\
+                <li class="btn" id="aboutProg">' + _Lang[LS.get('lang')]['aboutProg'] + '</li>\
             </ul>\
         ';
         showFullSize(HTML);
+        _STORE.backToPanel = 'writer';
     } else if (_STORE.panel == 'lang') {
         HTML = '<select id="langChanger">'
         Object.keys(_LangNames).forEach(function(key, index) {
@@ -30,6 +37,10 @@ var _Render = function () {
         });
         HTML += '</select>';
         showFullSize(HTML);
+    } else if (_STORE.panel == 'about') {
+         showFullSize(
+            '<div>' + _Lang[LS.get('lang')]['aboutText'] + '</div><div id="findUpdate">' + _Lang[LS.get('lang')]['findUpdate'] + '</div>'
+        );
     } else {
         showFullSize();
     }

@@ -18,6 +18,7 @@ function init () {
     initlocalStorage();
     getDefaultState();
     _STORE.panel = 'writer';
+    _STORE.backToPanel = 'writer';
     app ();
 
 }
@@ -35,7 +36,7 @@ function app () {
         }
     });
 
-    $("#myTextWr .resWord").draggable();
+    // $("#phraseWr .resWord").draggable();
 
     $("#delWord").droppable({
         hoverClass: "hover",
@@ -52,7 +53,7 @@ function app () {
         }
     });
 
-    $('#myTextWr').sortable({
+    $('#phraseWr').sortable({
         start: function () {
             $("#delWord").css('display', 'inline-block');
         },
@@ -72,7 +73,6 @@ function app () {
     $('body').on('keyup', '#myInput', function (e) {
         var code = e.which;
         var val = $(this).val();
-        // if (val.slice(-1) == " ") {
         if (code == 32 || code == 13) {
             if (code == 13) {
                 e.preventDefault();
@@ -130,14 +130,9 @@ function app () {
 
     $('body').on('click', '.fullSizeExit', function () {
         _STORE.panel = 'writer';
-        if (_STORE.isTplView) {
-            _STORE.isTplView = !_STORE.isTplView;
-            // $('#myTempl').trigger('click');
-            _STORE.panel = 'templates';
-            _Render();
-            return true;
-        }
-        // showFullSize();
+        var targ = _STORE.backToPanel;
+        _STORE.panel = targ;
+        _STORE.backToPanel = targ;
         _Render();
     });
 
@@ -151,8 +146,8 @@ function app () {
     $('body').on('click', '#myTempl', function () {
         _STORE.panel = 'templates';
         _STORE.isTplView = false;
+        _STORE.backToPanel = 'writer';
         _Render();
-        editTpl();
     });
 
     $('body').on('click', '#saveText', function () {
@@ -186,36 +181,80 @@ var editTpl = function () {
         $(this).toggleClass('unactive active');
     });
 
-    $('.tplItem').on('click', function () {
-        var tplId = $(this).attr('data-item');
-        if (!isEditable) {
-            _STORE.isTplView = true;
-            showFullSize(
-                '<ul>' +
-                buildTextString(LS.get('myTpl')[tplId].data) +
-                '</ul>'
-            );
-        } else {
-            _STORE.isTplView = false;
-            showFullSize();
-            $('#myInput').val();
+
+    // $(".tplItem").draggable();
+
+    $("#delTpl").droppable({
+        hoverClass: "hover",
+        drop: function( event, ui ) {
+            var id = ui.draggable.attr('data-item');
             eventDispatcher({
-                tpl: LS.get('myTpl')[tplId].data,
-                tplId: tplId,
-                event: 'editTpl'
+                tplId: id,
+                // wordPos: getPosById(ui.draggable.attr('data-item')),
+                event: 'deleteTpl'
             });
-            checkBtns();
-            printText();
+            // $('.resWord[data-item="' + id + '"]').remove();
+            _STORE.panel == 'templates';
+            _Render();
         }
-    });    
+    });
+
+    $('#tplList').sortable({
+        start: function () {
+            $("#delTpl").css('display', 'inline-block');
+        },
+        stop: function (event, ui) {
+            $("#delTpl").css('display', 'none');
+            eventDispatcher({
+                wordId: ui.item.attr('data-item'),
+                oldPos: getPosById(ui.item.attr('data-item')),
+                event: 'rangeTpl',
+                newPos: ui.item.index()
+            });
+        }
+    });
+
+    $('#tplList .tplItem').on('click', function () {
+        var tplId = $(this).attr('data-item');
+        if (LS.get('myTpl').hasOwnProperty(tplId)) {
+            if (!isEditable) {
+                _STORE.isTplView = true;
+                _STORE.backToPanel = 'templates';
+                showFullSize(
+                    '<ul>' +
+                    buildTextString(LS.get('myTpl')[tplId].data) +
+                    '</ul>'
+                );
+            } else {
+                _STORE.isTplView = false;
+                _STORE.backToPanel = 'writer';
+                showFullSize();
+                $('#myInput').val();
+                eventDispatcher({
+                    tpl: LS.get('myTpl')[tplId].data,
+                    tplId: tplId,
+                    event: 'editTpl'
+                });
+                checkBtns();
+                printText();
+            }
+        }
+    });
 
 }
 
 var settingsTpl = function () {
     $('body').on('click', '#langChouse', function () {
         _STORE.panel = 'lang';
+        _STORE.backToPanel = 'settings';
         _Render();
         changeLang();
+    });
+    aboutProg
+    $('body').on('click', '#aboutProg', function () {
+        _STORE.panel = 'about';
+        _STORE.backToPanel = 'settings';
+        _Render();
     });
 };
 
@@ -229,10 +268,7 @@ var changeLang = function () {
 };
 
 var printText = function () {
-    var resText = '<ul>';
-    resText += buildTextString(_STORE.text, 'resWord');
-    resText += '</ul>';
-    $('#myTextWr').html(resText);
+    $('#phraseWr').html(buildTextString(_STORE.text, 'resWord'));
 };
 
 var buildTextString = function (src, className) {

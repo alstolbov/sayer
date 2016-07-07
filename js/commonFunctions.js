@@ -48,3 +48,10 @@ var removeWordFromArray = function (id) {
     }
     return _STORE.text;
 };
+
+var removeTpl = function (id) {
+    var tmp = LS.get('myTpl');
+    delete tmp[id];
+
+    return tmp;
+};
