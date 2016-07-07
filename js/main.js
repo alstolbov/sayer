@@ -8,16 +8,21 @@ function initlocalStorage () {
     if (!LS.isSet('lang')) {
         LS.set('lang', 'ru');
     }
+    if (!LS.isSet('colorSheme')) {
+        LS.set('colorSheme', 'default');
+    }
 }
 
 function init () {
 
     initlocalStorage();
-
     getDefaultState();
-
     _STORE.panel = 'writer';
+    app ();
 
+}
+
+function app () {
     _Render();
 
     _Localizer();
@@ -146,8 +151,8 @@ function init () {
     $('body').on('click', '#myTempl', function () {
         _STORE.panel = 'templates';
         _STORE.isTplView = false;
-         console.log('!');
         _Render();
+        editTpl();
     });
 
     $('body').on('click', '#saveText', function () {
@@ -165,6 +170,12 @@ function init () {
         getDefaultState();
         checkBtns();
         printText();
+    });
+
+    $('body').on('click', '#mySettings', function () {
+        _STORE.panel = 'settings';
+        _Render();
+        settingsTpl();
     });
 };
 
@@ -199,6 +210,23 @@ var editTpl = function () {
     });    
 
 }
+
+var settingsTpl = function () {
+    $('body').on('click', '#langChouse', function () {
+        _STORE.panel = 'lang';
+        _Render();
+        changeLang();
+    });
+};
+
+var changeLang = function () {
+    $('body').on('change', '#langChanger', function () {
+        LS.set('lang', $(this).val());
+        _STORE.panel = 'settings';
+        _Render();
+        _Localizer();
+    });
+};
 
 var printText = function () {
     var resText = '<ul>';

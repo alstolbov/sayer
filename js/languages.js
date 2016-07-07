@@ -5,15 +5,24 @@ var _Lang = {
     clearText: 'Очистить',
     saveText: 'Сохранить',
     showText: 'Показать',
-    editTpl: 'Редактировать'
+    editTpl: 'Редактировать',
+    mySettings: 'Настройки',
+    langChouse: 'Язык'
   },
 
   en: {
-    myTemplates: 'Шаблоны',
+    myTemplates: 'Templates',
     delWord: 'Delete',
     clearText: 'Clear',
     saveText: 'Save',
     showText: 'Show',
-    editTpl: 'Edit'
+    editTpl: 'Edit',
+    mySettings: 'Settings',
+    langChouse: 'Language'
   }
+};
+
+var _LangNames = {
+  ru: 'Русский',
+  en: 'English'
 };
