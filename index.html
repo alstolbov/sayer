@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Phrasman</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="css/main.css" type="text/css" media="all">
+        <script src="lib/jquery-3.0.0.min.js"></script>
+        <script src="lib/jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
+        <script src="lib/jquery.ui.touch-punch.min.js"></script>
+        <script src="lib/jquery.storageapi.min.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
+        <script type="text/javascript" src="js/render.js"></script>
+        <script type="text/javascript" src="js/eventDispatcher.js"></script>
+        <script type="text/javascript" src="js/commonFunctions.js"></script>
+        <script type="text/javascript" src="js/languages.js"></script>
+    </head>
+    <body>
+        <div id="myForm">
+            <div class="header">
+                <div class="leftPanelWr">
+                    <div id="myTempl" class="iconBtn"></div>
+                </div>
+                <div class="functWr">
+                    <div id="delWord" class="iconBtn" style="display: none;"></div>
+                </div>
+                <div class="rightPanelWr">
+                    <div id="mySettings" class="iconBtn"></div>
+                </div>
+                <div class="clear"></div>
+            </div>
+            <div id="myTextWr">
+                <ul id="phraseWr"></ul>
+            </div>
+            <div class="mainContentWr">
+                <div class="mainInputWr">
+                    <input type="text" id="myInput" value=""/>
+                </div>
+                <div class="finalBtnsWr">
+                    <div id="clearText" class="iconBtn disabled"></div>
+                    <div id="showText" class="btn btn-x2 disabled"></div>
+                    <div id="saveText" class="iconBtn disabled"></div>
+                </div>
+                <div id="fullSizeWr" style="display: none;">
+                    <div class="fullSizeExit" data-targ="writer"></div>
+                    <div class="fullSizeContentWr">
+                        <div class="fullSizeContent"></div>
+                    </div>
+                </div>
+                <div id="messageWr"></div>
+            </div>            
+        </div>
+        <!--
+        Сделать:
+            + удаление слова перетаскиванием
+            + перемещение слова с сторе при переносе
+            + обновление системы (автопредложение)
+
+            + добавление фразы в "Любимое"
+            + удаление фразы из "Любимое"
+            - предустановленные щаблоны
+            - ранжирование фаблонов фраз
+            - СЛОВАРИ
+            - добавление слова в словарь
+            - подсказка при наборе
+
+            Меню "Настройки":
+                - настройки стилей отображения (белое на черном, черное на белом? размер шрифта)
+                + смена языка
+                + О программе
+                - Обновить (с автопроверкой обновления)
+
+
+        Вторая очередь:
+            - история изменений
+        -->
+        <script id="settings" type="text/template">
+        </script>
+        <script type="text/javascript">
+            init();
+        </script>
+    </body>
+</html>

@@ -71,12 +71,17 @@ function app () {
     $('#myInput').focus();
 
     $('body').on('keyup', '#myInput', function (e) {
-        var code = e.which;
+        var code = e.keyCode || e.which;
         var val = $(this).val();
-        if (code == 32 || code == 13) {
-            if (code == 13) {
-                e.preventDefault();
-            }
+        if (code == 0 || code == 229) { //for android chrome keycode fix
+            code = val.charCodeAt(val.length - 1);
+        }
+        if (code == 13) {
+            $(this).blur();
+            _STORE.panel = 'showPhrase';
+            _Render();
+        }
+        if (code == 32) {
             if (!_STORE.text.hasOwnProperty(_STORE.currentTextPos)) {
                 _STORE.text[_STORE.currentTextPos] = {};
                 _STORE.text[_STORE.currentTextPos].id = uuid();
@@ -221,9 +226,9 @@ var editTpl = function () {
                 _STORE.isTplView = true;
                 _STORE.backToPanel = 'templates';
                 showFullSize(
-                    '<ul>' +
-                    buildTextString(LS.get('myTpl')[tplId].data) +
-                    '</ul>'
+                    '<div class="fullPhrase">' +
+                    buildSimpleText(LS.get('myTpl')[tplId].data) +
+                    '</div>'
                 );
             } else {
                 _STORE.isTplView = false;
@@ -282,6 +287,17 @@ var buildTextString = function (src, className) {
     return resText;
 };
 
+var buildSimpleText = function (src, className) {
+    var resText = '';
+    var className = className ? 'class="' + className + '" ' : '';
+    var dataItem;
+    src.forEach(function (wordData) {
+        dataItem = wordData.id ? ' data-item="' + wordData.id + '" ' : '';
+        resText += '<span ' + className + dataItem + '>' + wordData.word + '</span>';
+    });
+    return resText;
+};
+
 var showFullSize = function (text) {
     if (text) {
         $('#fullSizeWr').css('display', 'block');
@@ -299,7 +315,7 @@ var checkBtns = function () {
         show = true;
     }
 
-    $('.finalBtnsWr .btn').each(function (ind, el) {
+    $('.finalBtnsWr .btn, .finalBtnsWr .iconBtn').each(function (ind, el) {
         var isToggle = false;
         if (!show && !$(el).hasClass('disabled')) {
             isToggle = true;

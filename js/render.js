@@ -1,23 +1,27 @@
 var _Render = function () {
     var HTML = '';
     if (_STORE.panel == 'templates') {
-        HTML = '<div class="btn editabledTpl unactive">' + _Lang[LS.get('lang')]['editTpl'] + '</div>';
-        HTML += '<div class="btn" id="delTpl" style="display: none;">' + _Lang[LS.get('lang')]['delTpl'] + '</div>';
-        HTML += '<ul id="tplList">';
-        Object.keys(LS.get('myTpl')).forEach(function(key, index) {
-            HTML += '<li class="btn tplItem" data-item="' + key + '"><ul>' ;
-            HTML += buildTextString(LS.get('myTpl')[key].data);
-            HTML += '</ul></li>';
-        });
-        HTML += '</ul>';
+        if (!Object.keys(LS.get('myTpl')).length) {
+            HTML += '<div class="msgWr">' + _Lang[LS.get('lang')]['noTemplates'] + '</div>';
+        } else {
+            HTML = '<div class="btn editabledTpl unactive">' + _Lang[LS.get('lang')]['editTpl'] + '</div>';
+            HTML += '<div class="btn" id="delTpl" style="display: none;">' + _Lang[LS.get('lang')]['delTpl'] + '</div>';
+            HTML += '<ul id="tplList">';
+            Object.keys(LS.get('myTpl')).forEach(function(key, index) {
+                HTML += '<li class="btn tplItem" data-item="' + key + '">' ;
+                HTML += buildSimpleText(LS.get('myTpl')[key].data);
+                HTML += '</li>';
+            });
+            HTML += '</ul>';
+        }
         showFullSize(HTML);
         editTpl();
         _STORE.backToPanel = 'writer';
     } else if (_STORE.panel == 'showPhrase') {
         showFullSize(
-            '<ul>' +
-            buildTextString(_STORE.text) + 
-            '</ul>'
+            '<div class="fullPhrase">' +
+            buildSimpleText(_STORE.text) + 
+            '</div>'
         );
     } else if (_STORE.panel == 'settings') {
         HTML += '\
@@ -57,4 +61,5 @@ var _Localizer = function () {
     $('#saveText').html(_Lang[locale]['saveText']);
     $('#showText').html(_Lang[locale]['showText']);
     $('#mySettings').html(_Lang[locale]['mySettings']);
+    $('#myInput').attr("placeholder", _Lang[locale]['myInput']);
 }

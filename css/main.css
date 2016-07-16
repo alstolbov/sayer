@@ -1,24 +1,227 @@
-#myTextWr {
-    min-height: 40px;
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    background-color: #f9f9f9;
+    color: #333;
+    font-size: 1.3em;
+    line-height: 1.4em;
+    font-family: Arial, Helvetica, sans-serif;
+}
+ul {
+    margin: 0;
+    padding: 0;
+}
+li {
+    list-style: none;
+}
+div#myForm {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+.mainInputWr {
+    width: 100%;
+    margin: 0;
+    text-align: center;
+}
+input#myInput {
+    background-color: #fff;
+    display: inline-block;
+    width: 90%;
+    padding: 0.4em;
+    border: 2px solid #9e9e9e;
+    font-size: 1.6em;
+    color: #333;
+    outline: none;
+}
+input#myInput:focus {
+    border: 2px solid #409ee6;
+}
+.clear {
+    clear: both;
+}
+.btn {
+    display: inline-block;
+    margin: 0.4em;
+    padding: 0.4em 0.6em;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    cursor: pointer;
+    color: #3e3e3e;
+}
+.btn:active {
+    background-color: #666;
+}
+.btn-x2 {
+    color: #fff;
+    background-color: #409ee6;
+    font-size: 1.5em;
+    border: 1px solid #409ee6;
+}
+.btn-x2:active {
+    color: #409ee6;
+    background-color: rgba(64, 158, 230, 0.14);
+}
+div#showText {
+
+}
+#delWord {
+    opacity: 0.5;
+}
+.iconBtn {
+    display: inline-block;
+    width: 70px;
+    height: 70px;
+    margin: 0.4em;
+    /*padding: 0.4em 0.6em;*/
+    /*border: 2px solid #ddd;*/
+    background-color: #fff;
+    cursor: pointer;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 45px;
+    border-radius: 70px;
+    text-indent: -9999px;
+    vertical-align: middle;
+}
+.iconBtn:active {
+    background-color: #666;
+}
+#myTempl.iconBtn {
+    background-image: url('../img/templates.png');
+}
+#mySettings.iconBtn {
+    background-image: url('../img/settings.png');
+}
+#saveText.iconBtn{
+    background-image: url('../img/save.png');
+}
+#clearText.iconBtn{
+    background-image: url('../img/erase.png');
+}
+.btn.editabledTpl:before {
+    content: '';
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    background-repeat: no-repeat;
+    background-size: 30px;
+}
+.btn.editabledTpl.active:before {
+    background-image: url('../img/checked_checkbox.png');
+    background-position: 0px 9px;
+}
+.btn.editabledTpl.unactive:before {
+    background-image: url('../img/unchecked_checkbox.png');
+    background-position: 0px 9px;
+}
+#delWord.iconBtn {
+    background-image: url('../img/trash.png');
+    background-color: transparent;
+    background-size: 50px;
+}
+#delWord.iconBtn.hover {
+    background-size: 60px;
+}
+.fullSizeExit {
+    width: 40px;
+    height: 40px;
+    background-image: url('../img/close.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 40px;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+.fullSizeContentWr {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+.fullSizeContent {
+    width: 100%;
+    padding-top: 65px;
+}
+.fullPhrase {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+.fullPhrase span {
+    padding-right: 0.4em;
+    font-size: 3em;
+    word-wrap: break-word;
+    line-height: 1.2em;
+}
+/*
+#saveText {
+    float: right;
+}
+#clearText {
+    float: left;
+}
+#showText {
+    padding: 0.4em 4.8em;
+}
+*/
+.mainContentWr {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+.leftPanelWr {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+.rightPanelWr {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+.functWr {
+    /* width: 100%; */
+    padding: 0px 120px;
+    min-height: 100px;
+    text-align: center;
+}
+
+.finalBtnsWr {
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+    width: 94%;
+    padding: 0.4em;
+}
+div#myTextWr {
+    width: 100%;
+    height: 20%;
+    overflow: auto;
+}
+.finalBtnsWr .btn {
+
+}
+ul#phraseWr {
+    padding: 0 2%;
 }
 .resWord {
     display: inline-block;
     margin-right: 10px;
-    padding: 5px;
-    border: 1px solid #ddd;
-    background-color: #fff;
+    border-bottom: 1px solid #ddd;
     cursor: pointer;
 }
 .resWord.active {
-    background-color: #666;
-}
-.btn {
-    display: inline-block;
-    margin: 10px;
-    padding: 5px;
-    border: 1px solid #ddd;
     background-color: #fff;
-    cursor: pointer;
+    padding: 5px 10px;
+    border: 1px solid rgba(64, 158, 230, 0.6);
 }
 .disabled {
     opacity: 0.5;
@@ -35,11 +238,9 @@
     left: 0;
     background-color: #fff;
 }
-.functWr {
-    height: 50px;
-}
+
 #messageWr {
-    width: 100px;
+    width: 100%;
     height: 30px;
-    border: 1px solid #666;
+    background-color: #fff;
 }
